@@ -1,19 +1,16 @@
 const express = require("express")
+const userRoutes = require("./routes/userRoutes")
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors')
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const router = require("./routes/userRoutes");
 require("dotenv").config();
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 
-// mongoose.connect(process.env.MONGO_URL,{
-//     useNewUrlParser:true,
-//     useUnifiedTopology:true
-// })
-
-const uri = "mongodb+srv://saik64757:<password>@chatappdataset1.ctrjihu.mongodb.net/?appName=chatappdataSet1";
+app.use("/api/auth",userRoutes)
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(process.env.MONGO_URL, {

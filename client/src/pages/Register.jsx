@@ -1,22 +1,76 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Logo from '../assets/logo.svg'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
+import axios from 'axios'
+import { registerRoute } from '../utils/apiRoutes';
 
 
 function Register() {
+  const [formValues, setFormValues] = useState({ username: "", email: "", password: "", confirmpassword: "" })
 
-  const handleSubmit = (e)=>{
-      e.preventDefault()
-      alert("Form")
+  const ToastOptions = {
+    position: "bottom-right",
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,}
+
+  const handleValidation = () => {
+    const { username, email, password, confirmpassword } = formValues
+    if (password !== confirmpassword) {
+      toast("Password and Confirm Password is Not Same ❌.",
+        ToastOptions
+      )
+      return false
+    }else if(username.length<3){
+      toast("User name Should be Greater than 3 Chars ❌.",
+        ToastOptions
+      )
+      return false
+    }else if(password.length<8){
+      toast("Password Should be Greater than 8 Chars ❌.",
+        ToastOptions
+      )
+      return false
+    }else if(!email.includes("@")){
+      toast("Please Enter Valid Email ❌.",
+        ToastOptions
+      )
+      return false
+  }  
+  return true
+}
+  const handleSubmit =async (e) => {
+    e.preventDefault()
+    if(handleValidation()){
+      const {username, email, password, confirmpassword} = formValues
+      const response = await axios.post(registerRoute, {username, email, password, confirmpassword})
+      toast(response.data.message,
+        ToastOptions
+      )
+    }
   }
-  const handleChange = (e)=>{
-      console.log(e.target)
+
+  const handleChange = (e) => {
+    console.log(e.target)
+    setFormValues((prevState) => {
+      return {
+        ...formValues,
+        [e.target.name]: e.target.value
+      }
+    })
   }
+  console.log("formValues", formValues)
   return (
-    <div><FormContainer>
+    <div>
+      <FormContainer>
       <form onSubmit={handleSubmit}>
-        <div className='brand' onChange={(e)=>handleChange(e)}>
+        <div className='brand' onChange={(e) => handleChange(e)}>
           <img src={Logo} alt="Logo" />
           <h1>Snappy</h1>
           <input type="text" placeholder='Username' name='username' />
@@ -27,7 +81,10 @@ function Register() {
           <span>already have an account? <Link to='/login'>Login</Link></span>
         </div>
       </form>
-      </FormContainer></div>
+    </FormContainer>
+    <ToastContainer/>
+    </div>
+    
   )
 }
 
